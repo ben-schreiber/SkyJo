@@ -1,4 +1,5 @@
 from random import shuffle
+from card import Card
 
 
 class Deck:
@@ -8,13 +9,13 @@ class Deck:
     """
 
     def __init__(self):
-        self.deck = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] * 10
+        self.deck: list = [Card(value) for value in range(-2, 13) for _ in range(10)]
         self.shuffle_deck()
 
     def shuffle_deck(self):
         shuffle(self.deck)
 
-    def draw_card(self):
+    def draw_card(self) -> Card:
         return self.deck.pop()
 
     def add_in_garbage_pile(self, pile):
