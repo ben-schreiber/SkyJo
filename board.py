@@ -11,7 +11,7 @@ class Board:
     def __init__(self, deck: Deck):
         self.board = np.array([deck.draw_card() for _ in range(12)], dtype=Card).reshape(3, 4)
 
-    def score(self) -> int:
+    def get_score(self) -> int:
         """Returns the score of the board"""
         return np.sum(self.board)
 
@@ -81,6 +81,7 @@ class Board:
                     self.board = np.delete(self.board, col, 1)
                     check_cols = True
                     break
+    
 
 if __name__ == '__main__':
     deck = Deck()
@@ -92,3 +93,4 @@ if __name__ == '__main__':
     print(board)
     board.apply_move(2, 0, Card(12))
     print(board)
+    print(board.went_out())
