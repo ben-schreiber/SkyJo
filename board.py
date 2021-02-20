@@ -11,6 +11,10 @@ class Board:
     def __init__(self, deck: Deck):
         self.board = np.array([deck.draw_card() for _ in range(12)], dtype=Card).reshape(3, 4)
 
+    def score(self) -> int:
+        """Returns the score of the board"""
+        return np.sum(self.board)
+
     @property
     def num_rows(self) -> int:
         return self.board.shape[0]
