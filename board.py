@@ -13,7 +13,7 @@ class Board:
 
     def get_score(self) -> int:
         """Returns the score of the board"""
-        return np.sum(self.board)
+        return np.sum(np.vectorize(Card.get_value)(self.board.ravel()))
 
     @property
     def num_rows(self) -> int:
