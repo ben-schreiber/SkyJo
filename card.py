@@ -1,8 +1,9 @@
 class Card:
-
     def __init__(self, value: int):
         if value < -2 or value > 12:
-            raise ValueError(f'The value {value} is not legal. Must be in the range [-2, 12]')
+            raise ValueError(
+                f"The value {value} is not legal. Must be in the range [-2, 12]"
+            )
         self.value: int = value
         self.hidden: bool = False
 

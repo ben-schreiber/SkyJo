@@ -9,7 +9,9 @@ class Board:
     """
 
     def __init__(self, deck: Deck):
-        self.board = np.array([deck.draw_card() for _ in range(12)], dtype=Card).reshape(3, 4)
+        self.board = np.array(
+            [deck.draw_card() for _ in range(12)], dtype=Card
+        ).reshape(3, 4)
 
     def get_score(self) -> int:
         """Returns the score of the board"""
@@ -24,19 +26,19 @@ class Board:
         return self.board.shape[1]
 
     def __str__(self) -> str:
-        out_str = ''
+        out_str = ""
         for row in range(self.num_rows):
-            out_str += '-' * self.num_cols * 5
-            out_str += '-\n' 
+            out_str += "-" * self.num_cols * 5
+            out_str += "-\n"
             for col in range(self.num_cols):
-                row_str = '| {:>2} '
+                row_str = "| {:>2} "
                 if self.board[row, col].is_hidden():
-                    out_str += row_str.format('X')
+                    out_str += row_str.format("X")
                 else:
                     out_str += row_str.format(self.board[row, col].get_value())
-            out_str += '|\n'
-        out_str += '-' * self.num_cols * 5
-        out_str += '-\n' 
+            out_str += "|\n"
+        out_str += "-" * self.num_cols * 5
+        out_str += "-\n"
         return out_str
 
     def get_board(self):
@@ -51,9 +53,13 @@ class Board:
             card:
         """
         if row < 0 or row >= self.num_rows:
-            raise ValueError(f'The row entered ({row}) is outside the player\'s board of size ({num_rows} X {num_cols})')
+            raise ValueError(
+                f"The row entered ({row}) is outside the player's board of size ({num_rows} X {num_cols})"
+            )
         elif col < 0 or col >= self.num_cols:
-            raise ValueError(f'The column entered ({col}) is outside the player\'s board of size ({num_rows} X {num_cols})')
+            raise ValueError(
+                f"The column entered ({col}) is outside the player's board of size ({num_rows} X {num_cols})"
+            )
         else:
             self.board[row, col] = card
             self.contract_board()
@@ -81,9 +87,9 @@ class Board:
                     self.board = np.delete(self.board, col, 1)
                     check_cols = True
                     break
-    
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     deck = Deck()
     board = Board(deck)
     print(board)

@@ -5,9 +5,10 @@ from card import Card
 
 
 class Game:
-
     def __init__(self, num_players: int, max_score: int):
         self.players = np.array([Player(i) for i in range(num_players)])
+        self.deck = Deck()
+        [_player.init_board(self.deck) for _player in self.players]
         self.max_score = max_score
         self.num_players = num_players
 
@@ -24,36 +25,35 @@ class Game:
         # Play all turns of the round until someone goes out
         while not_last_turn:
             for user in self.players:
-                user.play_turn()
+                user.play_turn(self.deck)
                 if user.went_out():
                     player_to_go_out = user.id
                     not_last_turn = False
                     break
-        
+
         # Play the last turn for each player who wasn't the one to go out
         for i in range(self.num_players - 1):  # Play the last round
-            self.players[(player_to_go_out + 1 + i) % self.num_players].play_turn(last_turn=True)
+            self.players[(player_to_go_out + 1 + i) % self.num_players].play_turn(
+                self.deck, last_turn=True
+            )
 
         # Calculate and update scores accordingly
         scores = np.vectorize(Player.update_score)(self.players)
-        if scores[player_to_go_out] != scores.min():  
+        if scores[player_to_go_out] != scores.min():
             # If the player to go out didn't have the lowest score, double his score for the round
             self.players[player_to_go_out].score += scores[player_to_go_out]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from argparse import ArgumentParser
 
-    parser = ArgumentParser('Input the number of players')
+    parser = ArgumentParser("Input the number of players")
 
-    parser.add_argument('-n', '--num_players', dest='num_players', type=int, default=2)
-    parser.add_argument('-s', '--score', dest='score', type=int, default=100)
+    parser.add_argument("-n", "--num_players", dest="num_players", type=int, default=2)
+    parser.add_argument("-s", "--score", dest="score", type=int, default=100)
 
     args = parser.parse_args()
 
-    game = Game(
-        num_players = args.num_players,
-        max_score = args.score
-        )
+    game = Game(num_players=args.num_players, max_score=args.score)
 
     game.run_game()
