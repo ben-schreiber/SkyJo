@@ -15,6 +15,10 @@ class Deck:
         ]
         self.shuffle_deck()
         self.__put_pile = [self.draw_card()]
+    
+    def throw_card_into_put_pile(self, card: Card):
+        """Throws the given card into the put pile"""
+        self.__put_pile.append(card)
 
     def shuffle_deck(self):
         """
@@ -26,7 +30,9 @@ class Deck:
         """
         Returns the next card at the top of the draw pile.
         """
-        if len(self.__draw_deck) == 0:  # The deck is empty, empty the put pile, shuffle it and add it to the draw pile
+        if (
+            len(self.__draw_deck) == 0
+        ):  # The deck is empty, empty the put pile, shuffle it and add it to the draw pile
             self.__recycle_put_pile()
         return self.__draw_deck.pop()
 

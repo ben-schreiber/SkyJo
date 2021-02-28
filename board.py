@@ -13,6 +13,10 @@ class Board:
             [deck.draw_card() for _ in range(12)], dtype=Card
         ).reshape(3, 4)
 
+    def check_uncovered(self, row: int, col: int) -> bool:
+        """Returns True iff the card at (row, col) is uncovered"""
+        return not self.board[row, col].is_hidden()
+
     def get_score(self) -> int:
         """Returns the score of the board"""
         return np.sum(np.vectorize(Card.get_value)(self.board.ravel()))
@@ -44,13 +48,16 @@ class Board:
     def get_board(self):
         return self.board
 
-    def apply_move(self, row: int, col: int, card: Card):
+    def apply_move(self, row: int, col: int, card: Card = None) -> Card:
         """
-        Applies the value given to the board at the position (row, col)
+        Applies the value given to the board at the position (row, col).
+        If card == None, then will flip the card at the given location
         Args:
             row:
             col:
             card:
+        Returns:
+            The card that used to be in (row, col). Will return the card itself if card == None
         """
         if row < 0 or row >= self.num_rows:
             raise ValueError(
@@ -61,8 +68,14 @@ class Board:
                 f"The column entered ({col}) is outside the player's board of size ({num_rows} X {num_cols})"
             )
         else:
-            self.board[row, col] = card
+            if card:
+                to_return = self.board[row, col]
+                self.board[row, col] = card
+            else:
+                self.board[row, col].flip_over()
+                to_return = self.board[row, col]
             self.contract_board()
+            return to_return
 
     def contract_board(self):
         """

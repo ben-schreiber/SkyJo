@@ -14,7 +14,7 @@ class Game:
 
     def run_game(self):
         """Runs an entire game. Until all players other than one pass the score threshold"""
-        while np.sum(self.players.get_score() < self.max_score) > 1:
+        while np.sum(np.vectorize(Player.get_score)(self.players) < self.max_score) > 1:
             self.one_round()
 
     def one_round(self):
