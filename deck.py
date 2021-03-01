@@ -15,7 +15,7 @@ class Deck:
         ]
         self.shuffle_deck()
         self.__put_pile = [self.draw_card()]
-    
+
     def throw_card_into_put_pile(self, card: Card):
         """Throws the given card into the put pile"""
         self.__put_pile.append(card)
