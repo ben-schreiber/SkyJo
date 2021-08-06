@@ -1,12 +1,12 @@
 import numpy as np
-from player import Player
+from player import *
 from deck import Deck
 from card import Card
 
 
 class Game:
     def __init__(self, num_players: int, max_score: int):
-        self.players = np.array([Player(i) for i in range(num_players)])
+        self.players = np.array([HumanPlayer(i) for i in range(num_players)])
         self.deck = Deck()
         [_player.init_board(self.deck) for _player in self.players]
         self.max_score = max_score

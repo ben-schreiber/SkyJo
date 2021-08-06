@@ -12,6 +12,8 @@ class Board:
         self.board = np.array(
             [deck.draw_card() for _ in range(12)], dtype=Card
         ).reshape(3, 4)
+        self.board[0, 0].flip_over()
+        self.board[0, 1].flip_over()
 
     def check_uncovered(self, row: int, col: int) -> bool:
         """Returns True iff the card at (row, col) is uncovered"""
@@ -61,11 +63,13 @@ class Board:
         """
         if row < 0 or row >= self.num_rows:
             raise ValueError(
-                f"The row entered ({row}) is outside the player's board of size ({num_rows} X {num_cols})"
+                f"The row entered ({row}) is outside the player's board of size"
+                f" ({self.num_rows} X {self.num_cols})"
             )
         elif col < 0 or col >= self.num_cols:
             raise ValueError(
-                f"The column entered ({col}) is outside the player's board of size ({num_rows} X {num_cols})"
+                f"The column entered ({col}) is outside the player's board of size"
+                f" ({self.num_rows} X {self.num_cols})"
             )
         else:
             if card:
@@ -108,8 +112,9 @@ if __name__ == "__main__":
     print(board)
     board.apply_move(0, 0, Card(12))
     print(board)
-    board.apply_move(1, 0, Card(12))
+    board.apply_move(0, 1, Card(12))
     print(board)
-    board.apply_move(2, 0, Card(12))
+    board.apply_move(0, 2, Card(12))
     print(board)
-    print(board.went_out())
+    board.apply_move(0, 3, Card(12))
+    print(board)
