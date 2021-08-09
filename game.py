@@ -1,21 +1,32 @@
 import numpy as np
 from player import *
 from deck import Deck
-from card import Card
+from abc import ABC, abstractmethod
 
 
-class Game:
-    def __init__(self, num_players: int, max_score: int):
-        self.players = np.array([HumanPlayer(i) for i in range(num_players)])
-        self.deck = Deck()
-        [_player.init_board(self.deck) for _player in self.players]
+class Game(ABC):
+
+    def __init__(self, num_players: int, max_score: int, num_human_players: int):
         self.max_score = max_score
         self.num_players = num_players
+        self.deck = Deck()
+        self.players = np.array([HumanPlayer(i) for i in range(num_human_players)] + [CPUPlayer(i) for i in range(num_human_players, num_players)])
+        [_player.init_board(self.deck) for _player in self.players]  
 
     def run_game(self):
         """Runs an entire game. Until all players other than one pass the score threshold"""
         while np.sum(np.vectorize(Player.get_score)(self.players) < self.max_score) > 1:
             self.one_round()
+
+    @abstractmethod
+    def one_round(self):
+        """Runs one round of the game"""
+        pass
+
+
+class CLIGame(Game):
+    def __init__(self, *args):
+        super().__init__(*args)    
 
     def one_round(self):
         """Runs one round of the game"""
@@ -51,9 +62,18 @@ if __name__ == "__main__":
 
     parser.add_argument("-n", "--num_players", dest="num_players", type=int, default=2)
     parser.add_argument("-s", "--score", dest="score", type=int, default=100)
+    parser.add_argument("--num_human_players", dest="human_players", type=int, default=None)
+    parser.add_argument("-i", "--interface", dest="interface", type=str, default="cli")
 
     args = parser.parse_args()
+    if args.human_players is None:
+        args.human_players = args.num_players
 
-    game = Game(num_players=args.num_players, max_score=args.score)
+    if args.interface == "cli":
+        game = CLIGame(args.num_players, args.score, args.human_players)
+    elif args.interface == "gui":
+        pass
+    else:
+        raise ValueError(f"The interface type {args.interface} is invalid. Please try again")
 
     game.run_game()

@@ -12,8 +12,9 @@ class Board:
         self.board = np.array(
             [deck.draw_card() for _ in range(12)], dtype=Card
         ).reshape(3, 4)
-        self.board[0, 0].flip_over()
-        self.board[0, 1].flip_over()
+        [c.flip_over('down') for c in self.board]
+        self.board[0, 0].flip_over('up')
+        self.board[0, 1].flip_over('up')
 
     def check_uncovered(self, row: int, col: int) -> bool:
         """Returns True iff the card at (row, col) is uncovered"""
