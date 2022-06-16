@@ -1,3 +1,0 @@
-Design Ideas:
-  - Refactor the Player class to have a base class (abstract) and an inheriting class for each type of player
-  - Create a game-interface Interface class to allow for GUI, CLI, and AI games
