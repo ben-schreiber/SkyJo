@@ -1,6 +1,6 @@
 import numpy as np
 from player import *
-from deck import Deck
+from pile import Deck
 from abc import ABC, abstractmethod
 
 

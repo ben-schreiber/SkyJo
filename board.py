@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 from typing import Iterable
 
-from deck import DrawPile
+from pile import DrawPile
 from card import Card
 
 
