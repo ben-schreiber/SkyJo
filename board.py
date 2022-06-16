@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 import numpy as np
-from deck import Deck
+from typing import Iterable
+
+from deck import DrawPile
 from card import Card
 
 
@@ -8,29 +12,34 @@ class Board:
     Represents a single player's board
     """
 
-    def __init__(self, deck: Deck):
-        self.board = np.array(
-            [deck.draw_card() for _ in range(12)], dtype=Card
-        ).reshape(3, 4)
-        [c.flip_over('down') for c in self.board]
-        self.board[0, 0].flip_over('up')
-        self.board[0, 1].flip_over('up')
+    def __init__(self, cards: Iterable[Card]):
+        if len(cards) != 12:
+            raise ValueError('Must initialize board with exactly 12 cards')
+        self.__board = np.array(cards, dtype=Card).reshape(3, 4)
 
-    def check_uncovered(self, row: int, col: int) -> bool:
+    @classmethod
+    def from_pile(cls, pile: DrawPile) -> Board:
+        cards = [pile.draw_card() for _ in range(12)]
+        for card in cards:
+            card.is_hidden = True
+        return cls(cards)
+
+    def is_uncovered(self, row: int, col: int) -> bool:
         """Returns True iff the card at (row, col) is uncovered"""
-        return not self.board[row, col].is_hidden()
+        return not self.__board[row, col].is_hidden
 
-    def get_score(self) -> int:
+    @property
+    def score(self) -> int:
         """Returns the score of the board"""
-        return np.sum(np.vectorize(Card.get_value)(self.board.ravel()))
+        return sum(card for card in self.__board.ravel() if not card.is_hidden)
 
     @property
     def num_rows(self) -> int:
-        return self.board.shape[0]
+        return self.__board.shape[0]
 
     @property
     def num_cols(self) -> int:
-        return self.board.shape[1]
+        return self.__board.shape[1]
 
     def __str__(self) -> str:
         out_str = ""
@@ -39,17 +48,14 @@ class Board:
             out_str += "-\n"
             for col in range(self.num_cols):
                 row_str = "| {:>2} "
-                if self.board[row, col].is_hidden():
+                if self.__board[row, col].is_hidden:
                     out_str += row_str.format("X")
                 else:
-                    out_str += row_str.format(self.board[row, col].get_value())
+                    out_str += row_str.format(str(self.__board[row, col]))
             out_str += "|\n"
         out_str += "-" * self.num_cols * 5
         out_str += "-\n"
         return out_str
-
-    def get_board(self):
-        return self.board
 
     def apply_move(self, row: int, col: int, card: Card = None) -> Card:
         """
@@ -72,15 +78,14 @@ class Board:
                 f"The column entered ({col}) is outside the player's board of size"
                 f" ({self.num_rows} X {self.num_cols})"
             )
+        if card:
+            to_return = self.__board[row, col]
+            self.__board[row, col] = card
         else:
-            if card:
-                to_return = self.board[row, col]
-                self.board[row, col] = card
-            else:
-                self.board[row, col].flip_over()
-                to_return = self.board[row, col]
-            self.contract_board()
-            return to_return
+            self.__board[row, col].is_hidden = False
+            to_return = self.__board[row, col]
+        self.contract_board()
+        return to_return
 
     def contract_board(self):
         """
@@ -92,30 +97,44 @@ class Board:
 
             check_rows = False
             for row in range(self.num_rows):
-                bool_arr = self.board[row] == self.board[row][0]
-                if np.all(bool_arr):
-                    self.board = np.delete(self.board, row, 0)
+                if np.all(self.__board[row] == self.__board[row][0]):
+                    self.__board = np.delete(self.__board, row, 0)
                     check_rows = True
                     break
 
             check_cols = False
             for col in range(self.num_cols):
-                bool_arr = self.board[:, col] == self.board[:, col][0]
-                if np.all(bool_arr):
-                    self.board = np.delete(self.board, col, 1)
+                if np.all(self.__board[:, col] == self.__board[:, col][0]):
+                    self.__board = np.delete(self.__board, col, 1)
                     check_cols = True
                     break
 
 
 if __name__ == "__main__":
-    deck = Deck()
-    board = Board(deck)
+    pile = DrawPile()
+    board = Board.from_pile(pile)
     print(board)
-    board.apply_move(0, 0, Card(12))
+    print(board.score)
+
+    board.apply_move(0, 0)
     print(board)
-    board.apply_move(0, 1, Card(12))
+    print(board.score)
+
+    board.apply_move(0, 1)
     print(board)
-    board.apply_move(0, 2, Card(12))
+    print(board.score)
+
+    board.apply_move(0, 2)
     print(board)
-    board.apply_move(0, 3, Card(12))
+    print(board.score)
+
+    board.apply_move(0, 3)
     print(board)
+    print(board.score)
+
+    for i in range(3):
+        card = Card(10)
+        card.is_hidden = False
+        board.apply_move(i, 2, card)
+        print(board)
+        print(board.score)

@@ -15,9 +15,6 @@ class Player:
     def __eq__(self, other):
         return self.id == other.id
 
-    def get_id(self) -> int:
-        return self.id
-
     def went_out(self) -> bool:
         """Returns True if the player has flipped all cards in his board"""
         return not np.any(np.vectorize(Card.is_hidden)(self.board.get_board().ravel()))
