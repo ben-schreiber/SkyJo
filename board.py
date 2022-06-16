@@ -16,6 +16,9 @@ class Board:
         if len(cards) != 12:
             raise ValueError('Must initialize board with exactly 12 cards')
         self.__board = np.array(cards, dtype=Card).reshape(3, 4)
+    
+    def __iter__(self):
+        yield from self.__board.ravel()
 
     @classmethod
     def from_pile(cls, pile: DrawPile) -> Board:
@@ -31,7 +34,7 @@ class Board:
     @property
     def score(self) -> int:
         """Returns the score of the board"""
-        return sum(card for card in self.__board.ravel() if not card.is_hidden)
+        return sum(card for card in self if not card.is_hidden)
 
     @property
     def num_rows(self) -> int:

@@ -1,72 +1,55 @@
-from deck import Deck
+import abc
+from deck import DrawPile
 from card import Card
 from board import Board
 from typing import Tuple
 import numpy as np
 
 
-class Player:
+class Player(abc.ABC):
     def __init__(self, _id: int):
         self.id = _id
-        self.board: Board = None
-        self.score: int = 0
-        self.deck: Deck = None
+        self.board = None
+        self.score = 0
 
     def __eq__(self, other):
         return self.id == other.id
 
     def went_out(self) -> bool:
         """Returns True if the player has flipped all cards in his board"""
-        return not np.any(np.vectorize(Card.is_hidden)(self.board.get_board().ravel()))
+        return not np.any(card.is_hidden for card in self.board)
 
-    def init_board(self, deck: Deck):
+    def init_board(self, draw_pile: DrawPile):
         """
         Initializes the player's board with the given deck
         Args:
             deck: The deck (of type Deck) to draw from
         """
-        self.deck = deck
-        self.board = Board(deck)
+        self.board = Board.from_pile(draw_pile)
 
-    def get_score(self) -> int:
-        """
-        Returns the player's score for the course of the game
-        """
-        return self.score
-
+    @abc.abstractmethod
     def play_turn(self, deck, last_turn: bool = False):
         raise NotImplementedError()
 
     def update_score(self) -> int:
         """Updates the user's overall score and returns the score for the round"""
-        score = self.board.get_score()
+        score = self.board.score
         self.score += score
         return score
-
-
-class CPUPlayer(Player):
-    """A CPU Player"""
-
-    def __init__(self, _id: int):
-        super().__init__(_id)
-
-    def play_turn(self, deck: Deck, last_turn: bool = False):
-        pass
 
 
 class HumanPlayer(Player):
     """A Human player"""
 
-    DRAW_CARD: str = "d"
-    GRAB_TOP_OF_PILE: str = "g"
-    SWAP_CARD: str = "s"
-    FLIP_CARD: str = "f"
-    VALID_USER_INPUTS_GD: set = {DRAW_CARD, GRAB_TOP_OF_PILE}
-    VALID_USER_INPUTS_SF: set = {SWAP_CARD, FLIP_CARD}
+    DRAW_CARD = "d"
+    GRAB_TOP_OF_PILE = "g"
+    SWAP_CARD = "s"
+    FLIP_CARD = "f"
+    VALID_USER_INPUTS_GD = {DRAW_CARD, GRAB_TOP_OF_PILE}
+    VALID_USER_INPUTS_SF = {SWAP_CARD, FLIP_CARD}
 
-    def __init__(self, _id: int, interface=None):
+    def __init__(self, _id: int):
         super().__init__(_id)
-        self.interface = interface
 
     def choose_card_on_board(self, include_flipped: bool = False) -> Tuple[int, int]:
         """Prompts the user to choose a covered card on their board"""
@@ -104,7 +87,7 @@ class HumanPlayer(Player):
         )
         self.deck.throw_card_into_put_pile(swapped_card)
 
-    def flip_card(self, deck: Deck, card_in_hand: Card):
+    def flip_card(self, deck: DrawPile, card_in_hand: Card):
         """Allows the user to flip a card on the board"""
         deck.throw_card_into_put_pile(card_in_hand)
         row, col = self.__user_choose_card_on_board()
