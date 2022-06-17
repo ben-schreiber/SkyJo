@@ -100,14 +100,14 @@ class Board:
 
             check_rows = False
             for row in range(self.num_rows):
-                if np.all(self.__board[row] == self.__board[row][0]):
+                if (self.__board[row] == self.__board[row][0]).all():
                     self.__board = np.delete(self.__board, row, 0)
                     check_rows = True
                     break
 
             check_cols = False
             for col in range(self.num_cols):
-                if np.all(self.__board[:, col] == self.__board[:, col][0]):
+                if (self.__board[:, col] == self.__board[:, col][0]).all():
                     self.__board = np.delete(self.__board, col, 1)
                     check_cols = True
                     break

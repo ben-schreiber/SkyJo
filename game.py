@@ -1,32 +1,47 @@
 import numpy as np
 from player import *
-from pile import Deck
-from abc import ABC, abstractmethod
+from pile import PutPile, DrawPile
+import abc
+from typing import Iterable
 
 
-class Game(ABC):
+class Round:
+    def __init__(self, players: Iterable[Player]):
+        pass
 
-    def __init__(self, num_players: int, max_score: int, num_human_players: int):
-        self.max_score = max_score
-        self.num_players = num_players
-        self.deck = Deck()
-        self.players = np.array([HumanPlayer(i) for i in range(num_human_players)] + [CPUPlayer(i) for i in range(num_human_players, num_players)])
-        [_player.init_board(self.deck) for _player in self.players]  
-
-    def run_game(self):
-        """Runs an entire game. Until all players other than one pass the score threshold"""
-        while np.sum(np.vectorize(Player.get_score)(self.players) < self.max_score) > 1:
-            self.one_round()
-
-    @abstractmethod
-    def one_round(self):
-        """Runs one round of the game"""
+    def play_round(self):
         pass
 
 
-class CLIGame(Game):
-    def __init__(self, *args):
-        super().__init__(*args)    
+class Game(abc.ABC):
+
+    def __init__(self, num_players: int, max_score: int):
+        self.max_score = max_score
+        self.num_players = num_players
+        self.draw_pile = DrawPile()
+        self.put_pile = PutPile()
+        self.players = tuple(HumanPlayer(i) for i in range(num_players))
+         
+
+    def run_game(self):
+        """
+        Runs an entire game. Until all players other than one pass the score threshold
+        """
+        remaining_players = [player for player in self.players if player.score < self.max_score]
+        while len(remaining_players) > 1:
+            r = Round(remaining_players)
+            r.play_round()
+            remaining_players = [player for player in remaining_players if player.score < self.max_score]
+
+    @abc.abstractmethod
+    def one_round(self):
+        """
+        Runs one round of the game
+        """
+        pass
+
+
+class CLIGame(Game):  
 
     def one_round(self):
         """Runs one round of the game"""

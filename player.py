@@ -17,7 +17,7 @@ class Player(abc.ABC):
 
     def went_out(self) -> bool:
         """Returns True if the player has flipped all cards in his board"""
-        return not np.any(card.is_hidden for card in self.board)
+        return not any(card.is_hidden for card in self.board)
 
     def init_board(self, draw_pile: DrawPile):
         """
